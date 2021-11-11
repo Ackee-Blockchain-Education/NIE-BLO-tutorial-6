@@ -1,0 +1,96 @@
+= 8 - Tutorial
+
+== Tutorial objectives
+
+* Introduction into security auditing
+* Increase skill in recognizing known security flaws
+* Ability to write unit tests in Brownie
+
+== Tutorial pre-requisites
+* Solidity and Python fundamentals
+* Brownie framework (https://eth-brownie.readthedocs.io/en/stable/install.html)
+    - Test if you installed everything correctly with commands below. Tests should be executed succesfully and `brownie gui` should working (needs tkinter package).
+    
+----
+    brownie bake token
+    cd token
+    brownie compile
+    brownie test
+----
+
+[CAUTION]
+====
+Computers in the laboratory don't allow to install programs and save their state between login sessions. Please bring your own hardware for these tutorials.
+====
+
+== Brownie
+Python-based development and testing framework for smart contracts
+
+Documentation: https://eth-brownie.readthedocs.io/en/stable/index.html
+
+=== Useful commands
+* init - initialize an empty project
+* compile - compile all of the contract sources
+* pm - package manager
+* test - will run your tests
+* console - starts local blockchain and python console
+* gui - will open GUI
+
+=== Unit test examples
+
+Test filenames must match `test_*.py` or `*_test.py`, be placed in `tests/` folder and test functions must start with `test*`.
+
+----
+import pytest
+import brownie
+
+def test_add_10(SomeContract,accounts):
+    contract = SomeContract.deploy({'from': accounts[0]})
+    contract.add(10)
+    assert contract.actualBalance() == 10
+    
+def test_add_20(SomeContract,accounts):
+    contract = SomeContract.deploy({'from': accounts[0]})
+    contract.add(20)
+    assert contract.actualBalance() == 20
+----
+
+Use `@pytest.fixture` on the function that initializes the contract to avoid code duplicity.
+
+----
+import pytest
+import brownie
+
+@pytest.fixture
+def some_contract(SomeContract,accounts):
+    contract = SomeContract.deploy({'from': accounts[0]})
+    return contract
+    
+def test_add_10(some_contract,accounts):
+    some_contract.add(10)
+    assert some_contract.actualBalance() == 10
+    
+def test_add_20(some_contract,accounts):
+    some_contract.add(20)
+    assert some_contract.actualBalance() == 20
+----
+
+For handling reverted transactions use `with brownie.reverts():` block.
+
+----
+import pytest
+import brownie
+
+@pytest.fixture
+def some_contract(SomeContract,accounts):
+    contract = SomeContract.deploy({'from': accounts[0]})
+    return contract
+    
+def test_add_10(some_contract,accounts):
+    some_contract.add(10)
+    assert some_contract.actualBalance() == 10
+    
+def test_add_260(some_contract,accounts):
+    with brownie.reverts(): # should revert because of uint8
+        some_contract.add(260)
+----
