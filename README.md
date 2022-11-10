@@ -1,4 +1,4 @@
-## Reentrancy
+## Bank
 Basic example of stealing funds using reentrancy.
 
 ```
