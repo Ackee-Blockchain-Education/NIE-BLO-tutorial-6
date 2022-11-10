@@ -27,7 +27,7 @@ Computers in the laboratory don't allow to install programs and save their state
 There are several different techniques to find vulnerabilities in smart contracts.
 To achieve the best possible output, it is recommended to combine them together.
 
-The first essential part is understanding the target contracts' main purpose.
+* The first essential part is understanding the target contracts' main purpose.
 Defi applications can be very complex, with different approaches to the same problems as reward logic, token distribution, etc.
 Read the documentation if it exists and try to understand the idea behind the project.
 
@@ -38,6 +38,7 @@ The code review is the most important and challenging part of the process. An au
 While browsing the code, use the tooling to extract helpful information (call graph, inheritance graph, state variables, etc.).
 The first goal is to understand the purpose of every single line. Sometimes the line does not make much sense - bug or feature?
 With a good understanding of the code, we can focus on the crucial parts:
+
 * Access control - Who can call the function? Why is there no modifier?
 * Requirements and conditions - Is the operator '<=' strict enough? Any way to bypass it?
 * State variables - Can a regular user make a state changing transaction? Does the change affect other users? Does the change happen in the correct order (reeantrancy)?
@@ -105,11 +106,13 @@ This approach can be used in algorithmic arbitrage trading, but it can also be w
 E.g. DAO (Decentralized Autonomous Organization) is a smart contract that can be used as a governance contract.
 Users stake their tokens, and based on the staked amount, they receive the corresponding voting power.
 DAO can be used to govern the staking pools and control a fee amount or an address of a fee receiver.
+
 Attack scenario: 
-Attackers use a flash loan,
-stake tokens to the DAO contract,
-beacuse of the flash loan he has a lot of voting power (more than 50%) to change the fee receiver to his own address,
-unstake, return the loan. 
+- Attackers use a flash loan,
+- stake tokens to the DAO contract,
+- beacuse of the flash loan he has a lot of voting power (more than 50%) to change the fee receiver to his own address,
+- unstake
+- return the loan. 
 It can all be done in one transaction using the customized smart contract.
 
 
@@ -193,7 +196,7 @@ def token():
 def distribute_tokens(token):
     for i in range(1, 10):
         token.transfer(accounts[i], 100, {'from': accounts[0]})
----
+----
 
 For handling reverted transactions use `with brownie.reverts():` block.
 
