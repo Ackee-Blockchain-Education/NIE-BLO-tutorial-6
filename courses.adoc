@@ -31,29 +31,27 @@ To achieve the best possible output, it is recommended to combine them together.
 Defi applications can be very complex, with different approaches to the same problems as reward logic, token distribution, etc.
 Read the documentation if it exists and try to understand the idea behind the project.
 
-Use the tools with automated vulnerability detectors (e.g. MythX, Woke, Slither, etc.).
+* Use the tools with automated vulnerability detectors (e.g. MythX, Woke, Slither, etc.).
 This way, finding the most common vulnerabilities is possible, but it is necessary to be aware of many false positives.
 
-The code review is the most important and challenging part of the process. An auditor can check +- 100 lines of code daily.
+* The code review is the most important and challenging part of the process. An auditor can check +- 100 lines of code daily.
 While browsing the code, use the tooling to extract helpful information (call graph, inheritance graph, state variables, etc.).
 The first goal is to understand the purpose of every single line. Sometimes the line does not make much sense - bug or feature?
 With a good understanding of the code, we can focus on the crucial parts:
+- Access control - Who can call the function? Why is there no modifier?
+- Requirements and conditions - Is the operator `< =` strict enough? Any way to bypass it?
+- State variables - Can a regular user make a state changing transaction? Does the change affect other users? Does the change happen in the correct order (reeantrancy)?
+- Inputs - Think about every input as a payload. Is there any payload that can allow me to access a critical line of code? Look for edge cases.
+- Solidity version - Does the contract use the old version? Is there any https://docs.soliditylang.org/en/v0.8.17/bugs.html[known vulnerability] in this version?
 
-* Access control - Who can call the function? Why is there no modifier?
-* Requirements and conditions - Is the operator '<=' strict enough? Any way to bypass it?
-* State variables - Can a regular user make a state changing transaction? Does the change affect other users? Does the change happen in the correct order (reeantrancy)?
-* Inputs - Think about every input as a payload. Is there any payload that can allow me to access a critical line of code? Look for edge cases.
-* Solidity version - Does the contract use the old version? Is there any known vulnerability in this version? (https://docs.soliditylang.org/en/v0.8.17/bugs.html)
-* etc.
-
-Interact with the contract when suspicious behavior is found. Deploy the project, simulate the real-world behavior, and write tests.
+* Interact with the contract when suspicious behavior is found. Deploy the project, simulate the real-world behavior, and write tests.
 If a project does not provide tests with good coverage, write them yourself. Unit tests, property-based tests, fuzzing, etc.
 Well-written tests can be used to verify the contract behavior and also break the code logic with randomized outputs.
 
 
 == Common vulnerabilities
 Just a few common vulnerabilities are described. Most of the issues cannot be easily categorized.
-Some of the known vulnerabilities can be found in a Registry of known issues (https://swcregistry.io/)
+Some of the known vulnerabilities can be found in https://swcregistry.io/[SWC Registry] of known issues.
 
 === Integer under/overflow
 When an unsigned integer reaches its maximal/minimal value, and then, it is incremented/decremented.
@@ -64,11 +62,11 @@ E.g. uint8 has range 2^8 (0-255).
     balance++; // balance = 0
     balance--; // balance = 255
 ----
-The issue no more exists for solidity version `>= 0.8.0` (https://docs.soliditylang.org/en/v0.8.0/080-breaking-changes.html#explicitness-requirements-for-arithmetic-types-conversion-and-literals).
+The issue no more exists for https://docs.soliditylang.org/en/v0.8.0/080-breaking-changes.html#explicitness-requirements-for-arithmetic-types-conversion-and-literals[solidity version] `>= 0.8.0`.
 
 === Reentrancy
 A dangerous situation when calling an external contract address. If the called contract is malicious, it can take control of the control flow.
-This type of bug can have many forms, but the basic idea stays the same. 
+This type of bug can have many forms, but the basic idea stays the same.
 If there is a call to the external address before the state change, there is a possibility of making a reentrancy attack.
 Reentrancy can be in the same function but also cross-function, cross-contract, and even cross-chain thanks to the cross-chain bridges.
 
@@ -76,11 +74,11 @@ Reentrancy can be in the same function but also cross-function, cross-contract, 
 ----
 mapping (address => uint) private userBalances;
 
-function withdrawBalance() public {
-    uint amountToWithdraw = userBalances[msg.sender];
-    (bool success, ) = msg.sender.call.value(amountToWithdraw)(""); // At this point, the caller's code is executed, and can call withdrawBalance again
-    require(success);
-    userBalances[msg.sender] = 0;  // because the state variable is updated after the call, the attacker can reenter the function and withdraw the same amount many times
+function withdrawBalance(uint amount) public {
+    require(userBalances[msg.sender] >= amount, "insufficient funds")
+    uint amountToWithdraw = userBalances[amount];
+    msg.sender.call.value(amountToWithdraw)(""); // Caller's code can be executed, and can call withdrawBalance again
+    userBalances[msg.sender] -= amount;  // State variable is updated after the call, attacker can drain the contract
 }
 ----
 [source: https://consensys.github.io/smart-contract-best-practices/attacks/reentrancy/]
@@ -107,12 +105,14 @@ E.g. DAO (Decentralized Autonomous Organization) is a smart contract that can be
 Users stake their tokens, and based on the staked amount, they receive the corresponding voting power.
 DAO can be used to govern the staking pools and control a fee amount or an address of a fee receiver.
 
-Attack scenario: 
-- Attackers use a flash loan,
-- stake tokens to the DAO contract,
-- beacuse of the flash loan he has a lot of voting power (more than 50%) to change the fee receiver to his own address,
-- unstake
-- return the loan. 
+Attack scenario:
+
+* Attacker uses a flash loan,
+* stakes tokens to the DAO contract,
+* because of the flash loan he has a lot of voting power (more than 50%) to change the fee receiver to his own address,
+* unstake
+* return the loan.
+
 It can all be done in one transaction using the customized smart contract.
 
 
@@ -139,10 +139,10 @@ Because of the python language, it is possible to use all the python features. T
 === Useful commands
 * test --coverage       - show coverage
 * test --gas            - show gas usage
-* test --interactive    - open interactive console if test fails 
+* test --interactive    - open interactive console if test fails
 * test - v              - verbose mode
 
-Test filenames must match `test_*.py` or `*_test.py`, be placed in `tests/` folder, and test functions must start with `test*`.
+Test filenames must match `test_*.py` or `**_test.py`, be placed in `tests/` folder, and test functions must start with `test*`.
 
 ==== Examples:
 ----
@@ -179,7 +179,7 @@ def test_add_20(some_contract,accounts):
     some_contract.add(20)
     assert some_contract.actualBalance() == 20
 ----
- 
+
 Fixtures can be used for any repetitive task. E.g. deploy a contract, mint some tokens, distribute tokens etc.
 With Python syntax and Brownie functionalities, it is possible to efficiently simulate real-world project behavior.
 
@@ -221,11 +221,11 @@ def test_add_260(some_contract,accounts):
 
 == Useful sources
 
-SWC vulnerability Registry: https://swcregistry.io/
-Rekt newsletter: https://rekt.news/
-Blockthreat newsletter: https://newsletter.blockthreat.io/
-Immunefi repository with sources: https://github.com/immunefi-team/Web3-Security-Library#smart-contracts
-CTF Ethernaut: https://ethernaut.openzeppelin.com/
-Legendary white hat hacker: https://twitter.com/samczsun
-Blog of Trail Of Bits (Probably the best auditing company): https://blog.trailofbits.com/
-Openzeppelin blog: https://blog.openzeppelin.com/
+* SWC vulnerability Registry: https://swcregistry.io/
+* Rekt newsletter: https://rekt.news/
+* Blockthreat newsletter: https://newsletter.blockthreat.io/
+* Immunefi repository with sources: https://github.com/immunefi-team/Web3-Security-Library#smart-contracts
+* CTF Ethernaut: https://ethernaut.openzeppelin.com/
+* Legendary white hat hacker: https://twitter.com/samczsun
+* Blog of Trail Of Bits (Top tier auditing company): https://blog.trailofbits.com/
+* Openzeppelin blog: https://blog.openzeppelin.com/
