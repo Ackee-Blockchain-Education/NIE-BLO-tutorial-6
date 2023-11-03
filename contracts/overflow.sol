@@ -1,18 +1,19 @@
-pragma solidity >=0.4.20 <0.8.0;
+// SPDX-License-Identifier: None
+
+pragma solidity =0.7.6;
 
 contract Overflow {
-  uint8 public lastBalance;
-  uint8 public actualBalance;
+    uint8 public lastBalance;
+    uint8 public actualBalance;
 
-  constructor() public {
-    lastBalance = 0;
-    actualBalance = 0;
-  }
+    constructor() {
+        lastBalance = 0;
+        actualBalance = 0;
+    }
 
-  function add(uint8 val) public returns (uint) {
-    lastBalance = actualBalance;
-    actualBalance += val;
-    return actualBalance;
-  }
-
+    function add(uint8 val) external returns (uint) {
+        lastBalance = actualBalance;
+        actualBalance += val;
+        return actualBalance;
+    }
 }
