@@ -15,3 +15,11 @@ A basic example of stealing funds using reentrancy.
 * Deploy Bank
 * Fill the Bank with some ether
 * Use a malicious contract to steal others' money
+
+# Forcing Ether to a Contract
+A basic example of force ether into the contract using self destruct function
+
+* Deploy DegenGame
+* Send some ether from a random account
+* Can you send more than 1 ETH?
+* Trick the game and win or cause nobody can win in one transaction
