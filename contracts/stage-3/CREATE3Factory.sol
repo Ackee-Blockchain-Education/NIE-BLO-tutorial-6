@@ -2,11 +2,15 @@
 pragma solidity =0.8.20;
 
 library Bytes32AddressLib {
-    function fromLast20Bytes(bytes32 bytesValue) internal pure returns (address) {
+    function fromLast20Bytes(
+        bytes32 bytesValue
+    ) internal pure returns (address) {
         return address(uint160(uint256(bytesValue)));
     }
 
-    function fillLast12Bytes(address addressValue) internal pure returns (bytes32) {
+    function fillLast12Bytes(
+        address addressValue
+    ) internal pure returns (bytes32) {
         return bytes32(bytes20(addressValue));
     }
 }
@@ -14,7 +18,8 @@ library Bytes32AddressLib {
 library CREATE3 {
     using Bytes32AddressLib for bytes32;
 
-    bytes internal constant TEMP_BYTECODE = type(TemporaryContract).creationCode;
+    bytes internal constant TEMP_BYTECODE =
+        type(TemporaryContract).creationCode;
     bytes32 internal constant TEMP_BYTECODE_HASH = keccak256(TEMP_BYTECODE);
 
     function deploy(
@@ -40,7 +45,10 @@ library CREATE3 {
         return getDeployed(salt, address(this));
     }
 
-    function getDeployed(bytes32 salt, address creator) internal pure returns (address) {
+    function getDeployed(
+        bytes32 salt,
+        address creator
+    ) internal pure returns (address) {
         address proxy = keccak256(
             abi.encodePacked(
                 // Prefix:
@@ -68,37 +76,32 @@ library CREATE3 {
 }
 
 interface ICREATE3Factory {
-    function deployContract(bytes32 salt, bytes memory creationCode)
-        external
-        payable
-        returns (address deployed);
+    function deployContract(
+        bytes32 salt,
+        bytes memory creationCode
+    ) external payable returns (address deployed);
 
-    function getDeployed(address deployer, bytes32 salt)
-        external
-        view
-        returns (address deployed);
+    function getDeployed(
+        address deployer,
+        bytes32 salt
+    ) external view returns (address deployed);
 }
 
 contract CREATE3Factory is ICREATE3Factory {
-    function deployContract(bytes32 salt, bytes memory creationCode)
-        external
-        payable
-        override
-        returns (address deployed)
-    {
+    function deployContract(
+        bytes32 salt,
+        bytes memory creationCode
+    ) external payable override returns (address deployed) {
         return CREATE3.deploy(salt, creationCode, msg.value);
     }
 
-    function getDeployed(address deployer, bytes32 salt)
-        external
-        view
-        override
-        returns (address deployed)
-    {
+    function getDeployed(
+        address deployer,
+        bytes32 salt
+    ) external view override returns (address deployed) {
         return CREATE3.getDeployed(salt);
     }
 }
-
 
 contract TemporaryContract {
     function metamorph(bytes memory initCode) public payable {

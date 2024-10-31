@@ -23,7 +23,7 @@ receive() exists?  fallback()
 ***/
 
 contract Bank {
-    mapping (address => uint) public userBalances;
+    mapping(address => uint) public userBalances;
 
     function stake() public payable {
         require(msg.value > 0);
@@ -47,7 +47,7 @@ contract Attacker {
     uint public count;
     uint public limit;
 
-    function setVictimAddress(address victim) payable public {
+    function setVictimAddress(address victim) public payable {
         b = Bank(victim);
     }
 
@@ -65,6 +65,6 @@ contract Attacker {
 
     fallback() external payable {
         count++;
-        if(count < limit) b.withdrawAll();
+        if (count < limit) b.withdrawAll();
     }
 }
