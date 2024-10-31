@@ -5,3 +5,6 @@ Hacking, debugging and testing with the Wake framework
 * Stage 1: Reentrancy
 * Stage 2: Forcing Ether
 * Stage 3: Metamorphosis
+
+# 0. Integer overflow
+A basic example of integer overflow.
