@@ -8,3 +8,10 @@ Hacking, debugging and testing with the Wake framework
 
 # 0. Integer overflow
 A basic example of integer overflow.
+
+## 1. Bank
+A basic example of stealing funds using reentrancy.
+
+* Deploy Bank
+* Fill the Bank with some ether
+* Use a malicious contract to steal others' money
