@@ -64,6 +64,10 @@ contract MaliciousERC20 {
         address recipient,
         uint256 amount
     ) public returns (bool) {
+        require(
+            sender == msg.sender || _allowances[sender][msg.sender] >= amount,
+            "ERC20: transfer amount exceeds allowance"
+        );
         _transfer(sender, recipient, amount);
         _approve(sender, msg.sender, _allowances[sender][msg.sender] - amount);
         return true;
@@ -76,6 +80,10 @@ contract MaliciousERC20 {
     ) internal {
         require(sender != address(0), "ERC20: transfer from the zero address");
         require(recipient != address(0), "ERC20: transfer to the zero address");
+        require(
+            _balances[sender] >= amount,
+            "ERC20: transfer amount exceeds balance"
+        );
 
         _balances[sender] = _balances[sender] - amount;
         _balances[recipient] = _balances[recipient] + amount;

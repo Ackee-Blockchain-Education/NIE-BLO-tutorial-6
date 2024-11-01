@@ -7,8 +7,8 @@ contract Overflow {
     uint8 public actualBalance;
 
     constructor() {
-        lastBalance = 0;
-        actualBalance = 0;
+        lastBalance = 1;
+        actualBalance = 1;
     }
 
     function add(uint8 val) external returns (uint) {
