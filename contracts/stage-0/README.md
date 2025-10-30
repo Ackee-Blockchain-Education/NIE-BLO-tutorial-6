@@ -1,4 +1,6 @@
-# Integer overflow
-A basic example of integer overflow.
+## Foo
+Too so simple to say something.
 
-Goal: make `actualBalance` zero.
+### Test Goals (`tests/test_stage_0.py`)
+
+- Demonstrate the attack

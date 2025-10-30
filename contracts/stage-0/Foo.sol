@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: None
 
-pragma solidity =0.7.6;
+pragma solidity ^0.8.20;
 
-contract Overflow {
+contract Foo {
     uint8 public lastBalance;
     uint8 public actualBalance;
 
@@ -12,8 +12,10 @@ contract Overflow {
     }
 
     function add(uint8 val) external returns (uint) {
-        lastBalance = actualBalance;
-        actualBalance += val;
-        return actualBalance;
+        unchecked {
+            lastBalance = actualBalance;
+            actualBalance += val;
+            return actualBalance;
+        }
     }
 }

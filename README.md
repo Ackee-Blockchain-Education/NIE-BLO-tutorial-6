@@ -1,25 +1,25 @@
 # NIE-BLO Tutorial 6
 
-Hacking, debugging and testing with the Wake framework.
+Hacking, debugging and testing smart contracts with the Wake framework.
 
-* Stage 0: Integer overflow.
-* Stage 1: Reentrancy.
-* Stage 2: Forcing Ether.
-* Stage 3: Metamorphosis.
+## Vulnerability Stages
 
-## Running the tests
+* **Stage 0**: Introduction
+* **Stage 1**: Some DEX
+* **Stage 2**: Simple Reentrancy
+* **Stage 3**: Some bug 1
+* **Stage 4**: Some bug 2
+* **Stage 5**: Another bug
 
-Write your tests in [`tests/test_default.py`](tests/test_default.py). If you are unsure, the complete version of the test can be found in the `solution` branch of this repository.
 
-To run the tests, make sure you have downloaded and installed Anvil:
+## Learning Objectives
 
-```bash
-curl -L https://foundry.paradigm.xyz | bash  # insecure install, you know
-source ~/.bashrc && foundryup
-```
+1. **Understand common vulnerability patterns** in real-world smart contracts
+2. **Practice exploit development** using Wake's testing framework
+3. **Learn mitigation strategies** for each vulnerability class
+4. **Develop security mindset** through hands-on exercises
 
-Next, you can run the following:
 
-```bash
-wake test
-```
+## Additional Resources
+
+- [Wake Documentation](https://ackee.xyz/wake/docs/latest/)

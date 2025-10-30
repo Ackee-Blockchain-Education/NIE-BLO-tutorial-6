@@ -1,6 +1,10 @@
-## Bank
-A basic example of stealing funds using reentrancy.
+## Stage 1 - DEX Frontrunning
 
-* Deploy Bank
-* Fill the Bank with some ether
-* Use the malicious contract to steal all the money from the bank
+`SimpleDEX` implements a constant-product AMM (x × y = k) without some security mechanisms. The `swapAforB` and `swapBforA` functions accept any input amount.
+
+### Test Goals (`tests/test_stage_1.py`)
+
+- Demonstrate the attack sequence with three transactions in unit test
+- Hint is "sandwich"
+- Show attacker's profit
+- Discuss mitigations
